@@ -1,0 +1,44 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Prepare mobile env
+        run: |
+          cat > litenote-mobile-app/.env.development <<EOF
+          API_BASE_URL=https://fin.fleey.site
+          SENTRY_DSN=
+          SENTRY_DSN_ANDROID=
+          EOF          
+
+      - name: Install deps (monorepo)
+        run: npm run install:all
+
+      - name: Build APK (Release)
+        run: npm run mobile:build:prod
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LiteNote-APK
+          path: litenote-mobile-app/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
