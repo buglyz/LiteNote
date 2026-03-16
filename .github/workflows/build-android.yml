@@ -2,7 +2,7 @@ name: Build & Release Android
 
 于:
   push:
-    分支: [main]
+    branches: [main]
     paths:
       - 'litenote-mobile-app/**'
   workflow_dispatch:
@@ -29,6 +29,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
           cache-dependency-path: litenote-mobile-app/package-lock.json
 
       - name: Setup JDK
